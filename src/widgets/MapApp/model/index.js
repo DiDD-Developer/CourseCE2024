@@ -1,22 +1,32 @@
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
+import { YandexMap } from "#shared/ui/Map/model";
 
 export class MapApp {
   constructor(storageName, apiClient) {
     this.storeService = new StoreService(storageName);
     this.apiClient = apiClient; // Сохраняем ApiClient как зависимость
+    this.yandexMap = new YandexMap({
+      containerSelector: "#map1",
+      apiUrl: "https://api-maps.yandex.ru/2.1/?apikey",
+      apiKey: "923d4771-168e-498b-aaa7-f8397276bed8",
+      lang: "ru_RU",
+      center: [55.751574, 37.573856],
+      zoom: 10,
+    });
+
+    this.yandexMap
+      .initMap()
+      .then((res) => {
+        console.debug("Карта инциализирована", res, this.yandexMap.instance);
+        this.yandexMap.addMark();
+      })
+      .catch((e) => console.error(e));
+
+    this.yandexMap.addMark();
     this.subscribeForStoreService();
     // Инициализация: сразу загружаем метки
     this.fetchMarkers();
-
-    console.debug(
-      "Тут будем реализовывать логику нашего виджета, вот готовый стор сервис ->",
-      this.storeService
-    );
-
-    setTimeout(() => {
-      this.storeService.updateStore("addMarker", { id: 33144, value: "test" });
-    }, 5000);
   }
 
   // Метод для загрузки меток с сервера
