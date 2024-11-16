@@ -16,25 +16,39 @@ export const createStore = (storageName) => {
           setMarkers: (markers) => set({ markers }),
           addMarker: (marker) => {
             set((state) => {
-              // Проверка, есть ли уже маркер с таким ID
-              const exists = state.markers.some((m) => m?.id === marker.id);
-              if (exists) {
-                console.warn(`Метка с ID ${marker.id} уже существует.`);
-                return state; // Не изменяем состояние, если маркер с таким ID уже существует
+              // Проверка, если маркер с таким ID уже существует, обновляем его
+              const updatedMarkers = state.markers.map((m) =>
+                m.id === marker.id ? { ...m, ...marker } : m
+              );
+              // Если маркер не найден, добавляем новый
+              if (updatedMarkers.every((m) => m.id !== marker.id)) {
+                updatedMarkers.push(marker);
               }
-              return {
-                markers: [...state.markers, marker], // Добавляем новый маркер
-              };
+              return { markers: updatedMarkers };
             });
           },
           // Новый метод: добавить список меток
-          addMarkers: (markers) => {
+          addMarkers: (newMarkers) => {
             set((state) => {
-              const existingIds = state.markers.map((m) => m.id);
-              const newMarkers = markers.filter(
-                (marker) => !existingIds.includes(marker.id)
-              );
-              return { markers: [...state.markers, ...newMarkers] };
+              // Для каждого маркера в списке проверяем, существует ли уже маркер с таким id
+              const updatedMarkers = [...state.markers];
+              newMarkers.forEach((marker) => {
+                // Если маркер с таким id уже существует, обновляем его
+                const markerIndex = updatedMarkers.findIndex(
+                  (m) => m.id === marker.id
+                );
+                if (markerIndex !== -1) {
+                  updatedMarkers[markerIndex] = {
+                    ...updatedMarkers[markerIndex],
+                    ...marker,
+                  };
+                } else {
+                  // Если маркера нет, добавляем новый
+                  updatedMarkers.push(marker);
+                }
+              });
+
+              return { markers: updatedMarkers };
             });
           },
           removeMarker: (markerId) =>

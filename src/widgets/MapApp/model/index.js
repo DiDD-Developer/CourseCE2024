@@ -11,19 +11,18 @@ export class MapApp {
       apiUrl: "https://api-maps.yandex.ru/2.1/?apikey",
       apiKey: "923d4771-168e-498b-aaa7-f8397276bed8",
       lang: "ru_RU",
-      center: [55.751574, 37.573856],
-      zoom: 10,
+      center: [53.751574, 57.573856],
+      zoom: 7,
     });
 
     this.yandexMap
       .initMap()
-      .then((res) => {
-        console.debug("Карта инциализирована", res, this.yandexMap.instance);
-        this.yandexMap.addMark();
+      .then(async () => {
+        this.yandexMap.renderMarks(this.storeService.getMarkers()); //Рендерим метки из стора
+        const marks = await this.getMarks();
+        this.storeService.updateStore("addMarkers", marks);
       })
       .catch((e) => console.error(e));
-
-    this.yandexMap.addMark();
     this.subscribeForStoreService();
     // Инициализация: сразу загружаем метки
     this.fetchMarkers();
@@ -54,12 +53,20 @@ export class MapApp {
     }
   }
 
+  async getMarks() {
+    return this.apiClient
+      .get(API_ENDPOINTS.marks.list)
+      .then((res) => res?.data?.marks);
+  }
+
   handleMarkersChanged() {
     console.debug("метки изменились", this.storeService.getMarkers());
+    this.yandexMap.renderMarks(this.storeService.getMarkers());
   }
 
   handleFiltersChanged() {
     console.debug("фильтры изменились", this.storeService.getFilters());
+    this.yandexMap.renderMarks(this.storeService.getFilters());
   }
 
   subscribeForStoreService() {
