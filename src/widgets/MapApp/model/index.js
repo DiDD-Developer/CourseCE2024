@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
+import { yandexMapCustomEventNames } from "#shared/ui/Map/config/constants";
 import { YandexMap } from "#shared/ui/Map/model";
 
 export class MapApp {
@@ -11,8 +12,8 @@ export class MapApp {
       apiUrl: "https://api-maps.yandex.ru/2.1/?apikey",
       apiKey: "923d4771-168e-498b-aaa7-f8397276bed8",
       lang: "ru_RU",
-      center: [53.751574, 57.573856],
-      zoom: 7,
+      center: [53.751574, 57.573856], //Выставил координаты метки, чтобы все время не передвигать карту к ней
+      zoom: 7, //Уменьшил зум с 10 до 7, чтобы было лучше видно метки
     });
 
     this.yandexMap
@@ -23,6 +24,8 @@ export class MapApp {
         this.storeService.updateStore("addMarkers", marks);
       })
       .catch((e) => console.error(e));
+
+    this.#bindYandexMapEvents();
     this.subscribeForStoreService();
     // Инициализация: сразу загружаем метки
     this.fetchMarkers();
@@ -59,6 +62,22 @@ export class MapApp {
       .then((res) => res?.data?.marks);
   }
 
+  async handleMarkerClick(e) {
+    const {
+      detail: { id, mark },
+    } = e;
+
+    try {
+      const res = await this.apiClient.get(API_ENDPOINTS.marks.detail, {
+        id: id,
+      });
+      const layout = this.yandexMap.getLayoutContentForBallon(res);
+      this.yandexMap.renderCustomBallon(mark, layout);
+    } catch (e) {
+      console.error(e);
+    }
+  }
+
   handleMarkersChanged() {
     console.debug("метки изменились", this.storeService.getMarkers());
     this.yandexMap.renderMarks(this.storeService.getMarkers());
@@ -81,5 +100,11 @@ export class MapApp {
   unsubscribeFromStoreService() {
     this.markerSubscription?.();
     this.subscribeOnStoreChange?.();
+  }
+
+  #bindYandexMapEvents() {
+    document.addEventListener(yandexMapCustomEventNames.markClicked, (e) => {
+      this.handleMarkerClick(e);
+    });
   }
 }

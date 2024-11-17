@@ -1,0 +1,21 @@
+.loader {
+  --loaderBgColor: #fff;
+  width: 48px;
+  height: 48px;
+  border: 5px solid var(--loaderBgColor); /* Сделаем цвет заметным */
+  border-bottom-color: transparent;
+  border-radius: 50%;
+  animation: rotation 1s linear infinite;
+  background-color: rgba(0, 0, 0, 0.1); /* Полупрозрачный фон для теста */
+}
+
+
+@keyframes rotation {
+  0% {
+    transform: rotate(0deg);
+  }
+  /* stylelint-disable-next-line rule-empty-line-before */
+  100% {
+    transform: rotate(360deg);
+  }
+}

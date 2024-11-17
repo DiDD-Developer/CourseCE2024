@@ -1,4 +1,11 @@
-.customPlacemark{
+.yandexMap{
+    --yandexMapWidthPlacemark: 4.625rem;
+    --yandexMapBallonLayoutWidth: 37.5rem;
+    --yandexMapBallonLayoutMinHeight: 48.25rem;
+    --yandexMapBallonContentBgColor: var(--colorWhite);
+    --yandexMapBallonLayoutBgColor: var(--colorWhite);
+
+    &__mark{
     display: flex;
     justify-content: center;
     align-items: center;
@@ -8,4 +15,71 @@
     aspect-ratio: 1 / 1;
     transition: all 0.3s;
     box-shadow: var(--boxShadowDefault);
+    }
+
+    &__ballonLayout{
+        position: relative;
+        width: var(--yandexMapBallonLayoutWidth);
+        min-height: var(--yandexMapBallonLayoutMinHeight);
+        background-color: var(--yandexMapBallonLayoutBgColor);
+        translate: calc(-50% + var(--yandexMapWidthPlacemark) / 2)
+            calc(-100% - 2rem);
+        padding: 2px;
+        border-radius: 2rem;
+    }
+
+    &__ballonContent {
+        /* Стили, которые здесь закомментированы, нужны в будущем для адекватного отображения стилей Spinner в балуне */
+        background-color: var(--yandexMapBallonContentBgColor);
+        //display: flex;
+        //justify-content: center;
+        //align-items: center;
+        width: 100%;
+        //height: 100%; /* Сделаем балун всегда высокой областью */
+        //position: relative; /* Убедимся, что позиционирование корректное */
+        margin-left: 10px;
+        margin-top: 2rem;
+    }
+
+    &__ballonTitle {
+        font-size: 2.5rem;
+        line-height: 3.025rem;
+    }
+
+    &__ballonMark{
+        display: flex;
+        align-items: center;
+    }
+
+    &__ballonMarkText{
+        font-size: 1.75rem;
+        line-height: 2.1175rem;
+        margin-left: 1.5rem;
+    }
+
+    &__ballonMarkTextAddress{
+        font-size: 1.75rem;
+        line-height: 2.1175rem;
+        max-width: 31.625rem;
+    }
+
+    &__ballonMarkText1{
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        font-size: 1.75rem;
+        line-height: 2.1175rem;
+        max-width: 31.625rem;
+    }
+
+    &__ballonMarksEditAndDelete{
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        max-width: 32.5rem;
+    }
+
+    &__ballonInfo{
+        margin-left: 20px;
+    }
 }
