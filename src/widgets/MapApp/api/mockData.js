@@ -39,10 +39,10 @@ export const markDetail = [
     comment:
       "Хороший бар и караоке, по средам у них специальные акции с коктейлями 2",
     images: [
-      "/images/image1.png",
-      "/images/image2.png",
-      "/images/image3.png",
-      "/images/image4.png",
+      "/assets/marksDetail/bar1.png", // /assets/marksDetail/bar1.png
+      "/assets/marksDetail/bar2.jpg",
+      "/assets/marksDetail/bar3.jpg",
+      "/assets/marksDetail/bar4.jpg",
     ],
   },
   {

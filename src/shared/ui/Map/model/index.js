@@ -1,3 +1,4 @@
+import { Swiper } from "swiper";
 import {
   iconsPresets,
   classNames as defaultClassNames,
@@ -32,6 +33,9 @@ export class YandexMap {
     this.currentBalloon = null;
     this.classNames = classNames ?? defaultClassNames;
     this.iconShapeCfg = iconShapeCfg ?? defaultIconShapeCfg;
+    this.attrs = {
+      ballon: "data-js-ballon",
+    };
   }
 
   getBallonLayout() {
@@ -52,16 +56,55 @@ export class YandexMap {
     throw new Error("ymaps not ready");
   }
 
-  getBallonContent({ children }) {
+  getBallonContent({ id, children }) {
     if (window.ymaps) {
       const ballonContent = window.ymaps.templateLayoutFactory.createClass(
-        `<div class="${this.classNames.ballonContent}">
-            ${children}
-        </div>`,
+        `<div class="${this.classNames.ballonContent}" data-js-ballon="${id}"> 
+                ${children}
+            </div>`,
         {
           build: function () {
             ballonContent.superclass.build.call(this);
-            // this.createSwiper(ballonId); TODO: доделать.
+
+            // Инициализация Swiper после создания балуна
+            try {
+              const ballonContainer = document.querySelector(
+                `[data-js-ballon="${id}"]`
+              );
+
+              if (!ballonContainer) {
+                throw new Error(`Ballon container with id "${id}" not found.`);
+              }
+
+              const swiperEl = ballonContainer.querySelector(".swiper");
+              if (!swiperEl) {
+                console.warn(
+                  "Swiper element not found in the ballon container."
+                );
+                return;
+              }
+
+              new Swiper(swiperEl, {
+                direction: "horizontal", // Горизонтальный свайп
+                loop: true,
+                pagination: {
+                  el: ballonContainer.querySelector(".swiper-pagination"),
+                  clickable: true,
+                },
+                navigation: {
+                  nextEl: ballonContainer.querySelector(".swiper-button-next"),
+                  prevEl: ballonContainer.querySelector(".swiper-button-prev"),
+                },
+                scrollbar: {
+                  el: ballonContainer.querySelector(".swiper-scrollbar"),
+                  draggable: true,
+                },
+              });
+
+              console.warn(`Swiper initialized for ballon with id "${id}"`);
+            } catch (e) {
+              console.error("Error initializing Swiper inside balloon:", e);
+            }
           },
           clear: function () {
             ballonContent.superclass.clear.call(this);
@@ -71,6 +114,46 @@ export class YandexMap {
       return ballonContent;
     }
     throw new Error("ymaps not ready");
+  }
+
+  createSwiper(ballonId) {
+    try {
+      const ballonContainer = document.querySelector(
+        `[data-js-ballon="${ballonId}"]`
+      );
+
+      if (!ballonContainer) {
+        throw new Error(`Ballon container with id "${ballonId}" not found.`);
+      }
+
+      const swiperEl = ballonContainer.querySelector(".swiper");
+      if (!swiperEl) {
+        throw new Error("Swiper element not found in the ballon container.");
+      }
+
+      new Swiper(swiperEl, {
+        direction: "horizontal", // Измените на "vertical", если нужен вертикальный свайп
+        loop: true,
+
+        pagination: {
+          el: ballonContainer.querySelector(".swiper-pagination"),
+          clickable: true,
+        },
+
+        navigation: {
+          nextEl: ballonContainer.querySelector(".swiper-button-next"),
+          prevEl: ballonContainer.querySelector(".swiper-button-prev"),
+        },
+        scrollbar: {
+          el: ballonContainer.querySelector(".swiper-scrollbar"),
+          draggable: true,
+        },
+      });
+
+      console.warn(`Swiper initialized for ballon with id "${ballonId}"`);
+    } catch (e) {
+      console.error("Error initializing Swiper:", e);
+    }
   }
 
   getMarkerLayout(typeMarker) {
@@ -145,6 +228,7 @@ export class YandexMap {
       {
         balloonLayout: this.getBallonLayout(),
         balloonContentLayout: this.getBallonContent({
+          id,
           children: Spinner(),
         }),
         hasBalloon: true,
@@ -186,30 +270,48 @@ export class YandexMap {
     document.dispatchEvent(customEvent);
   }
 
-  renderCustomBallon(mark, info) {
+  renderCustomBallon(id, mark, info) {
     mark.options.set(
       "balloonContentLayout",
       this.getBallonContent({
+        id,
         children: `${info}`,
       })
     );
   }
 
   getLayoutContentForBallon(info) {
-    console.warn("Вот здесь мы начинаем формировать верстку"); //TODO: ДЗ, сделать верстку балуна и вернуть ее (СДЕЛАНО НА 50% БЕЗ swiper пока что)
+    console.warn("Вот здесь мы начинаем формировать верстку");
+    const imagesHtml = info.data.images
+      .map(
+        (src) => `
+        <div class="swiper-slide">
+          <img src="${src}" alt="Image" style="width: 100%; height: auto;" />
+        </div>
+      `
+      )
+      .join("");
     return `
+      <div class="swiper ${this.classNames.ballonSwiperContent}">
+        <div class="swiper-wrapper">
+          ${imagesHtml}
+        </div>
+        <!-- Добавляем элементы управления -->
+        <div class="swiper-pagination"></div>
+        <div class="swiper-scrollbar"></div>
+      </div>
       <div class="${this.classNames.ballonContent}">
         <h1 class="${this.classNames.ballonTitle}">${info.data.title}</h1>
         <div class="${this.classNames.ballonMark}">
-         ${this.iconsPresets[info.data.type] ? this.iconsPresets[info.data.type] : info.data.type}
-         <p class="${this.classNames.ballonMarkText}">Бар</p>
-       </div>
-         <p class="${this.classNames.ballonMarkTextAddress}">${info.data.address.street}, ${info.data.address.house}</p>
-         <p class="${this.classNames.ballonMarkText1}">${info.data.comment}</p>
-         <div class="${this.classNames.ballonMarksEditAndDelete}">
-         <p class="${this.classNames.ballonMarkText1}">${EditBallonIcon({ iconColor: "var(--colorBlack)" })} Редактировать</p>
-         <div style="margin-right: 10px;">${DeleteIcon({ iconColor: "var(--colorChiliRed)" })}</div>
-         </div>
+          ${this.iconsPresets[info.data.type] ? this.iconsPresets[info.data.type] : info.data.type}
+          <p class="${this.classNames.ballonMarkText}">Бар</p>
+        </div>
+        <p class="${this.classNames.ballonMarkTextAddress}">${info.data.address.street}, ${info.data.address.house}</p>
+        <p class="${this.classNames.ballonMarkText1}">${info.data.comment}</p>
+        <div class="${this.classNames.ballonMarksEditAndDelete}">
+          <p class="${this.classNames.ballonMarkText1}">${EditBallonIcon({ iconColor: "var(--colorBlack)" })} Редактировать</p>
+          <div style="margin-right: 10px;">${DeleteIcon({ iconColor: "var(--colorChiliRed)" })}</div>
+        </div>
       </div>
     `;
   }

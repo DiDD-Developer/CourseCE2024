@@ -17,6 +17,7 @@ export const classNames = {
   ballonMarkTextAddress: "yandexMap__ballonMarkTextAddress",
   ballonMarkText1: "yandexMap__ballonMarkText1",
   ballonMarksEditAndDelete: "yandexMap__ballonMarksEditAndDelete",
+  ballonSwiperContent: "yandexMap__ballonSwiperContent",
   mark: "yandexMap__mark",
 };
 

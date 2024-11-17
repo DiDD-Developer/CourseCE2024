@@ -72,7 +72,7 @@ export class MapApp {
         id: id,
       });
       const layout = this.yandexMap.getLayoutContentForBallon(res);
-      this.yandexMap.renderCustomBallon(mark, layout);
+      this.yandexMap.renderCustomBallon(id, mark, layout);
     } catch (e) {
       console.error(e);
     }
