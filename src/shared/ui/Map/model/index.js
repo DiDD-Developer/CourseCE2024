@@ -1,4 +1,5 @@
 import { Swiper } from "swiper";
+import { Pagination } from "swiper/modules";
 import {
   iconsPresets,
   classNames as defaultClassNames,
@@ -9,7 +10,7 @@ import { checkMapInstance } from "../config/lib/checkMapInstance.js";
 import { getExternalScript } from "#shared/lib/utils/getExtetnalScript";
 import { DeleteIcon } from "#shared/ui/Icons/index";
 import { EditBallonIcon } from "#shared/ui/Icons/ui/EditBallonIcon.js";
-import { Spinner } from "#shared/ui/Spinner/index.js";
+// import { Spinner } from "#shared/ui/Spinner/index.js";
 
 export class YandexMap {
   constructor({
@@ -31,6 +32,7 @@ export class YandexMap {
     this.instance = null;
     this.iconsPresets = iconsPresets;
     this.currentBalloon = null;
+    this.currentMarkerIdOpen = null;
     this.classNames = classNames ?? defaultClassNames;
     this.iconShapeCfg = iconShapeCfg ?? defaultIconShapeCfg;
     this.attrs = {
@@ -86,6 +88,7 @@ export class YandexMap {
 
               new Swiper(swiperEl, {
                 direction: "horizontal", // Горизонтальный свайп
+                modules: [Pagination],
                 loop: true,
                 pagination: {
                   el: ballonContainer.querySelector(".swiper-pagination"),
@@ -132,7 +135,7 @@ export class YandexMap {
       }
 
       new Swiper(swiperEl, {
-        direction: "horizontal", // Измените на "vertical", если нужен вертикальный свайп
+        direction: "horizontal", // для горизонтального свайпа
         loop: true,
 
         pagination: {
@@ -229,7 +232,7 @@ export class YandexMap {
         balloonLayout: this.getBallonLayout(),
         balloonContentLayout: this.getBallonContent({
           id,
-          children: Spinner(),
+          children: `<h1>Загрузка...</h1>`, //Spinner(),
         }),
         hasBalloon: true,
         iconLayout: this.getMarkerLayout(typeMarker),
@@ -248,10 +251,12 @@ export class YandexMap {
       }
       // Обновляем ссылку на текущий открытый балун
       this.currentBalloon = placemark;
+      this.currentMarkerIdOpen = id;
     });
 
     placemark.events.add("balloonclose", () => {
       this.currentBalloon = null;
+      this.currentMarkerIdOpen = null;
     });
 
     this.instance.geoObjects.add(placemark);
@@ -259,6 +264,8 @@ export class YandexMap {
 
   handleMarkerClick(id, e) {
     const targetPlacemark = e.get("target");
+
+    if (this.currentBalloon && this.currentMarkerIdOpen === id) return;
 
     const customEvent = new CustomEvent(yandexMapCustomEventNames.markClicked, {
       detail: {
@@ -335,6 +342,16 @@ export class YandexMap {
       this.currentBalloon.balloon.close();
     }
     this.currentBalloon = null;
+    this.currentMarkerIdOpen = null;
+  }
+
+  @checkMapInstance
+  centerMapByCords(cords, zoom = 15) {
+    try {
+      this.instance.setCenter(cords, zoom);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   #bindEvents() {

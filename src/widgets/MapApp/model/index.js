@@ -1,5 +1,6 @@
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
+import { getDebouncedFn } from "#shared/lib/utils";
 import { yandexMapCustomEventNames } from "#shared/ui/Map/config/constants";
 import { YandexMap } from "#shared/ui/Map/model";
 
@@ -7,6 +8,10 @@ export class MapApp {
   constructor(storageName, apiClient) {
     this.storeService = new StoreService(storageName);
     this.apiClient = apiClient; // Сохраняем ApiClient как зависимость
+    this.apiGeoUrl = "https://geocode-maps.yandex.ru/1.x/?apikey";
+    this.apiKey = "923d4771-168e-498b-aaa7-f8397276bed8";
+    this.inputAddress = document.querySelector("#searchAddress"); //TODO: вынести в фильтр.
+    console.debug(this.inputAddress, "!!!");
     this.yandexMap = new YandexMap({
       containerSelector: "#map1",
       apiUrl: "https://api-maps.yandex.ru/2.1/?apikey",
@@ -27,6 +32,7 @@ export class MapApp {
 
     this.#bindYandexMapEvents();
     this.subscribeForStoreService();
+    this.#bindEvents(); //TODO: bindFilterEvents
     // Инициализация: сразу загружаем метки
     this.fetchMarkers();
   }
@@ -71,8 +77,8 @@ export class MapApp {
       const res = await this.apiClient.get(API_ENDPOINTS.marks.detail, {
         id: id,
       });
-      const layout = this.yandexMap.getLayoutContentForBallon(res);
-      this.yandexMap.renderCustomBallon(id, mark, layout);
+      const info = this.yandexMap.getLayoutContentForBallon(res);
+      this.yandexMap.renderCustomBallon(id, mark, info);
     } catch (e) {
       console.error(e);
     }
@@ -86,6 +92,33 @@ export class MapApp {
   handleFiltersChanged() {
     console.debug("фильтры изменились", this.storeService.getFilters());
     this.yandexMap.renderMarks(this.storeService.getFilters());
+  }
+
+  handleCenterMapByAddress(address) {
+    console.debug(address, "address");
+    //TODO: как-то проверять что yandexMap и переписать на apiClient (добавить параметр ingoreBaseUrl)
+    // this.apiClient.get(this.apiGeoUrl, {
+    //   apikey: this.apiKey,
+    //   geocode: encodeURIComponent(address),
+    //   format: "json",
+    // });
+
+    fetch(
+      `${this.apiGeoUrl}=${this.apiKey}&geocode=${encodeURIComponent(address)}&format=json`
+    )
+      .then((res) => res.json())
+      .then((data) => {
+        const coords =
+          data.response.GeoObjectCollection.featureMember[0]?.GeoObject?.Point?.pos?.split(
+            " "
+          );
+        if (coords) {
+          const lat = parseFloat(coords[1]);
+          const lon = parseFloat(coords[0]);
+          this.yandexMap.centerMapByCords([lat, lon]);
+        }
+      })
+      .catch((e) => console.error(e));
   }
 
   subscribeForStoreService() {
@@ -106,5 +139,17 @@ export class MapApp {
     document.addEventListener(yandexMapCustomEventNames.markClicked, (e) => {
       this.handleMarkerClick(e);
     });
+  }
+
+  //TODO: переписать на фильтры
+  #bindEvents() {
+    const debouncedHandleMapByAddress = getDebouncedFn(
+      this.handleCenterMapByAddress,
+      1000
+    ).bind(this);
+    if (this.inputAddress)
+      this.inputAddress.addEventListener("input", (e) => {
+        debouncedHandleMapByAddress(e.target.value);
+      });
   }
 }
