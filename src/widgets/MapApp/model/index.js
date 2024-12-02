@@ -1,3 +1,4 @@
+import { FilterManager } from "#features/Filter/model/index";
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
 import { getDebouncedFn } from "#shared/lib/utils";
@@ -5,6 +6,9 @@ import { CenterIcon } from "#shared/ui/Icons/index";
 import { yandexMapCustomEventNames } from "#shared/ui/Map/config/constants";
 import { YandexMap } from "#shared/ui/Map/model";
 
+/**
+ *
+ */
 export class MapApp {
   constructor(storageName, apiClient) {
     this.storeService = new StoreService(storageName);
@@ -16,12 +20,19 @@ export class MapApp {
     this.yandexMap = new YandexMap({
       containerSelector: "#map1",
       apiUrl: "https://api-maps.yandex.ru/2.1/?apikey",
-      apiKey: "923d4771-168e-498b-aaa7-f8397276bed8",
+      apiKey: this.apiKey,
       lang: "ru_RU",
       center: [53.751574, 57.573856], //Выставил координаты метки, чтобы все время не передвигать карту к ней
       zoom: 7, //Уменьшил зум с 10 до 7, чтобы было лучше видно метки
     });
 
+    this.filterManager = new FilterManager({
+      filterName: `marks`,
+      onUpdate: (changedData) => this.handleFilterChanged(changedData),
+    });
+
+    this.filterManager.applyFilters(this.storeService.getFilters()); //Применяем фильтры из стора
+    this.loadAndUpdateFilters();
     this.yandexMap
       .initMap()
       .then(async () => {
@@ -61,6 +72,30 @@ export class MapApp {
     } catch (error) {
       console.error("Ошибка при выполнении запроса меток:", error);
     }
+  }
+
+  //Обработчик изменения фильтров
+  handleFilterChanged(changeData) {
+    //TODO: есть замечение, касательно того, что мы всегда подвязываемся к полю inputs, а если у нас будет несколько фильтров? Нужно будет подумать над этим.
+    //Тут же необходимо делать проверку если менялось поле ввода адреса и центрировать карту
+    if (changeData.search) {
+      this.handleCenterMapByAddress(changeData.search.value);
+    }
+    const currentState = this.storeService.getFilters().inputs;
+    const updatedState = { ...currentState, ...changeData };
+    this.storeService.updateStore("setFilters", { inputs: updatedState });
+  }
+
+  loadAndUpdateFilters() {
+    (async () => {
+      try {
+        const filters = await this.getFiltersCfg();
+        this.storeService.updateStore("setFilters", filters);
+        this.filterManager.applyFilters(filters);
+      } catch (error) {
+        console.error("Ошибка при получении конфигурации фильтров:", error);
+      }
+    })();
   }
 
   async getMarks() {

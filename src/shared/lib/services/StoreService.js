@@ -1,5 +1,8 @@
 import { createStore } from "#shared/store/store";
 
+/**
+ *
+ */
 export class StoreService {
   constructor(storageName) {
     this.store = createStore(storageName);
