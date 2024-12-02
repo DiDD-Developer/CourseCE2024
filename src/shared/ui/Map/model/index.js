@@ -354,6 +354,38 @@ export class YandexMap {
     }
   }
 
+  //NEW: Добавил новый метод, показывающий метку с красным цветом по адресу, указанному в инпуте на странице
+  @checkMapInstance
+  centerMark({ id, type: typeMarker }) {
+    try {
+      // Если центральная метка уже существует, удаляем её
+      if (this.currentCenterMark) {
+        this.instance.geoObjects.remove(this.currentCenterMark);
+        this.currentCenterMark = null;
+      }
+
+      // Добавляем центральную метку
+      const placemark = new window.ymaps.Placemark(
+        this.instance.getCenter(), // Координаты центра карты
+        { id },
+        {
+          iconLayout: this.getMarkerLayout(typeMarker), // Используем кастомный макет для метки
+          iconShape: this.iconShapeCfg, // Настройки формы метки
+        }
+      );
+
+      // Добавляем метку на карту
+      this.instance.geoObjects.add(placemark);
+
+      // Сохраняем текущую метку для последующего удаления
+      this.currentCenterMark = placemark;
+
+      console.warn(`Метка с id "${id}" добавлена в центр карты.`);
+    } catch (error) {
+      console.error("Ошибка при добавлении метки в центр карты:", error);
+    }
+  }
+
   #bindEvents() {
     this.instance.events.add("click", () => {
       this.handleCloseCurrentBallon(); //TODO: а надо ли оставлять эту функцию для закрытия балуна при клике на карту? надо подумать

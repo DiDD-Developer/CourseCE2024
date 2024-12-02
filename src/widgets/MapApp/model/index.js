@@ -1,6 +1,7 @@
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
 import { getDebouncedFn } from "#shared/lib/utils";
+import { CenterIcon } from "#shared/ui/Icons/index";
 import { yandexMapCustomEventNames } from "#shared/ui/Map/config/constants";
 import { YandexMap } from "#shared/ui/Map/model";
 
@@ -116,6 +117,10 @@ export class MapApp {
           const lat = parseFloat(coords[1]);
           const lon = parseFloat(coords[0]);
           this.yandexMap.centerMapByCords([lat, lon]);
+          this.yandexMap.centerMark({
+            id: "center-point",
+            type: CenterIcon({ iconColor: "var(--colorRed)" }),
+          });
         }
       })
       .catch((e) => console.error(e));

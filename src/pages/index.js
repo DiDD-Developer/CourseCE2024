@@ -35,15 +35,43 @@ const IndexPage = () => `
         </div>
         <div class="isFlex mb16 gap8">
           ${Switch({
-            label: "Привет мир",
+            label: "Бары",
+            extraClasses: ["switch--isRightLabel"],
             extraInputAttrs: [
               { name: "name", value: "rememberMe" },
               { name: "form", value: "formAuth" },
             ],
           })}
-          
+
           ${Switch({
-            label: "Привет мир",
+            label: "Рестораны",
+            extraClasses: ["switch--isRightLabel"],
+            extraInputAttrs: [
+              { name: "name", value: "rememberMe" },
+              { name: "form", value: "formAuth" },
+            ],
+          })}
+
+          ${Switch({
+            label: "ТРК",
+            extraClasses: ["switch--isRightLabel"],
+            extraInputAttrs: [
+              { name: "name", value: "rememberMe" },
+              { name: "form", value: "formAuth" },
+            ],
+          })}
+
+          ${Switch({
+            label: "Театры",
+            extraClasses: ["switch--isRightLabel"],
+            extraInputAttrs: [
+              { name: "name", value: "rememberMe" },
+              { name: "form", value: "formAuth" },
+            ],
+          })}
+
+          ${Switch({
+            label: "Кино",
             extraClasses: ["switch--isRightLabel"],
             extraInputAttrs: [
               { name: "name", value: "rememberMe" },
