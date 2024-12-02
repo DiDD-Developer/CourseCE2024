@@ -1,8 +1,10 @@
 .placeSwitchGroup {
+  /* Основные стили карты (как в дизайне в Figma) */
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 2rem;
+  margin-bottom: 3rem;
+  margin-left: 210px;
 }
 .searchForPlaceOnTheMap{
   background: rgb(245, 245, 245);
@@ -14,9 +16,15 @@
   font-size: 2rem;
 }
 .searchForPlaceOnTheMap:focus {
-  border: 1px solid rgb(71, 114, 255);
+  border: 1px solid #fff;
   outline: none;
 }
+
+/* Когда любой дочерний элемент placeSwitchGroup в фокусе */
+.placeSwitchGroup:focus-within .icon-search {
+  opacity: 1; /* Делает иконку полностью видимой */
+}
+
 .searchForPlaceOnTheMap::placeholder{
   font-family: Inter;
   font-size: 2rem;

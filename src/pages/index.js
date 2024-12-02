@@ -34,7 +34,7 @@ const IndexPage = () => `
           ${Button({ text: "Нет", iconSlot: CancelIcon(), extraClasses: ["btn--isRedIcon"] })}
         </div>
 
-        <div style="max-width: 279px">
+        <div style="max-width: 279px;">
           ${CustomSelect({
             extraAttrs: [{ name: "id", value: "select-type-mark" }],
             cfg: {
@@ -138,7 +138,7 @@ const IndexPage = () => `
           })}
         </div>
         ${PlaceSwitchGroup()}
-        <div id="map1" class="yandexMap" style="width: 800px; aspect-ratio: 1 / 1"></div>
+        <div id="map1" class="yandexMap"></div>
       </main>
     </body>
   </html>
