@@ -1,4 +1,4 @@
-import { FilterManager } from "#features/Filter/model/index";
+// import { FilterManager } from "#features/Filter/model/index";
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
 import { getDebouncedFn } from "#shared/lib/utils";
@@ -26,13 +26,14 @@ export class MapApp {
       zoom: 7, //Уменьшил зум с 10 до 7, чтобы было лучше видно метки
     });
 
-    this.filterManager = new FilterManager({
-      filterName: `marks`,
-      onUpdate: (changedData) => this.handleFilterChanged(changedData),
-    });
+    //В этой части кода ошибка, не понимаю почему.
+    // this.filterManager = new FilterManager({
+    //   filterName: `marks`,
+    //   onUpdate: (changedData) => this.handleFilterChanged(changedData),
+    // });
 
-    this.filterManager.applyFilters(this.storeService.getFilters()); //Применяем фильтры из стора
-    this.loadAndUpdateFilters();
+    // this.filterManager.applyFilters(this.storeService.getFilters()); //Применяем фильтры из стора
+    // this.loadAndUpdateFilters();
     this.yandexMap
       .initMap()
       .then(async () => {
