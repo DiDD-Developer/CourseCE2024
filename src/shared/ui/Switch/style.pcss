@@ -43,7 +43,9 @@
       transition: var(--switchTransition);
     }
   }
-
+  .switch__slider{
+    margin-left: 4rem;
+  }
   &__input {
     /* stylelint-disable-next-line selector-class-pattern */
     &:checked + .switch__slider {
@@ -59,5 +61,7 @@
 
   &--isRightLabel {
     --switchFlexDirection: row-reverse;
+    position: relative;
+    top: 7px;
   }
 }

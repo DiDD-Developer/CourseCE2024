@@ -1,4 +1,4 @@
-// import { FilterManager } from "#features/Filter/model/index";
+import { FilterManager } from "#features/Filter/model/index";
 import { API_ENDPOINTS } from "#shared/config/constants.js"; //добавил путь до constans.js, чтобы получить API_ENDPOINTS
 import { StoreService } from "#shared/lib/services/StoreService";
 import { getDebouncedFn } from "#shared/lib/utils";
@@ -27,13 +27,13 @@ export class MapApp {
     });
 
     //В этой части кода ошибка, не понимаю почему.
-    // this.filterManager = new FilterManager({
-    //   filterName: `marks`,
-    //   onUpdate: (changedData) => this.handleFilterChanged(changedData),
-    // });
+    this.filterManager = new FilterManager({
+      filterName: `marks`,
+      onUpdate: (changedData) => this.handleFilterChanged(changedData),
+    });
 
-    // this.filterManager.applyFilters(this.storeService.getFilters()); //Применяем фильтры из стора
-    // this.loadAndUpdateFilters();
+    this.filterManager.applyFilters(this.storeService.getFilters()); //Применяем фильтры из стора
+    this.loadAndUpdateFilters();
     this.yandexMap
       .initMap()
       .then(async () => {
@@ -105,6 +105,12 @@ export class MapApp {
       .then((res) => res?.data?.marks);
   }
 
+  async getFiltersCfg() {
+    return this.apiClient
+      .get(API_ENDPOINTS.config.list)
+      .then((res) => res?.data);
+  }
+
   async handleMarkerClick(e) {
     const {
       detail: { id, mark },
@@ -121,14 +127,26 @@ export class MapApp {
     }
   }
 
-  handleMarkersChanged() {
-    console.debug("метки изменились", this.storeService.getMarkers());
-    this.yandexMap.renderMarks(this.storeService.getMarkers());
+  getFilteredMarkers() {
+    // Получаем активные фильтры из состояния хранилища
+    const activeFilters = this.storeService.getFilters().inputs;
+
+    // Фильтруем метки, оставляем только те, для которых фильтры включены (isChecked: true)
+    const filteredMarkers = this.storeService.getMarkers().filter((marker) => {
+      // Проверяем, включен ли фильтр для типа метки
+      return activeFilters[marker.type]?.isChecked;
+    });
+
+    return filteredMarkers;
   }
 
-  handleFiltersChanged() {
-    console.debug("фильтры изменились", this.storeService.getFilters());
-    this.yandexMap.renderMarks(this.storeService.getFilters());
+  handleMarkersChangedInStore() {
+    console.debug("markers changed", this.storeService.getMarkers());
+    // this.yandexMap.renderMarks(this.storeService.getMarkers());
+  }
+
+  handleFiltersChangedInStore() {
+    this.yandexMap.renderMarks(this.getFilteredMarkers());
   }
 
   handleCenterMapByAddress(address) {
@@ -164,10 +182,10 @@ export class MapApp {
 
   subscribeForStoreService() {
     this.markerSubscription = this.storeService.subscribeToMarkers(() => {
-      this.handleMarkersChanged();
+      this.handleMarkersChangedInStore();
     });
     this.filterSubscription = this.storeService.subscribeToFilters(() => {
-      this.handleFiltersChanged();
+      this.handleFiltersChangedInStore();
     });
   }
 

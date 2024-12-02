@@ -38,7 +38,8 @@ export const PlaceSwitchGroup = ({
   return `
     <div class="placeSwitchGroup ${extraClasses.join(" ")}" ${getGeneratedAttrs(extraAttrs)}>
       <div data-js-filter="marks">
-        <input type="text" name="search" data-js-filter-item="search" data-js-filter-parent-name="marks"/>
+        <img src="https://cdn-icons-png.flaticon.com/512/2311/2311526.png" alt="Иконка поиска" class="icon-search">
+        <input type="text" class="searchForPlaceOnTheMap" name="search" placeholder="Введите адрес" data-js-filter-item="search" data-js-filter-parent-name="marks"/>
         ${switchElements}
       </div>
     </div>

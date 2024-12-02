@@ -12,6 +12,9 @@ import { DeleteIcon } from "#shared/ui/Icons/index";
 import { EditBallonIcon } from "#shared/ui/Icons/ui/EditBallonIcon.js";
 // import { Spinner } from "#shared/ui/Spinner/index.js";
 
+/**
+ *
+ */
 export class YandexMap {
   constructor({
     containerSelector,
@@ -325,6 +328,7 @@ export class YandexMap {
 
   @checkMapInstance
   renderMarks(marks) {
+    this.clearMap(); //очистка перед рендером
     marks.forEach((mark) => {
       this.addMark({
         id: mark.id,
@@ -335,6 +339,11 @@ export class YandexMap {
         },
       });
     });
+  }
+
+  @checkMapInstance
+  clearMap() {
+    this.instance.geoObjects.removeAll();
   }
 
   handleCloseCurrentBallon() {

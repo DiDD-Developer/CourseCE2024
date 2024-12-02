@@ -1,3 +1,4 @@
+import { PlaceSwitchGroup } from "#features/PlaceSwitchGroup";
 import { Button } from "#shared/ui/Button/index";
 import { CustomSelect } from "#shared/ui/CustomSelect/index";
 import {
@@ -9,7 +10,6 @@ import {
   MusicIcon,
   TheatreIcon,
 } from "#shared/ui/Icons/index";
-import { Switch } from "#shared/ui/Switch/index";
 
 /**
  * Страница приложения
@@ -32,52 +32,6 @@ const IndexPage = () => `
         <div class="isFlex mb16 gap8">
           ${Button({ text: "Да", iconSlot: CheckIcon(), extraClasses: ["btn--isGreenLightIcon"] })}
           ${Button({ text: "Нет", iconSlot: CancelIcon(), extraClasses: ["btn--isRedIcon"] })}
-        </div>
-        <div class="isFlex mb16 gap8">
-          ${Switch({
-            label: "Бары",
-            extraClasses: ["switch--isRightLabel"],
-            extraInputAttrs: [
-              { name: "name", value: "rememberMe" },
-              { name: "form", value: "formAuth" },
-            ],
-          })}
-
-          ${Switch({
-            label: "Рестораны",
-            extraClasses: ["switch--isRightLabel"],
-            extraInputAttrs: [
-              { name: "name", value: "rememberMe" },
-              { name: "form", value: "formAuth" },
-            ],
-          })}
-
-          ${Switch({
-            label: "ТРК",
-            extraClasses: ["switch--isRightLabel"],
-            extraInputAttrs: [
-              { name: "name", value: "rememberMe" },
-              { name: "form", value: "formAuth" },
-            ],
-          })}
-
-          ${Switch({
-            label: "Театры",
-            extraClasses: ["switch--isRightLabel"],
-            extraInputAttrs: [
-              { name: "name", value: "rememberMe" },
-              { name: "form", value: "formAuth" },
-            ],
-          })}
-
-          ${Switch({
-            label: "Кино",
-            extraClasses: ["switch--isRightLabel"],
-            extraInputAttrs: [
-              { name: "name", value: "rememberMe" },
-              { name: "form", value: "formAuth" },
-            ],
-          })}
         </div>
 
         <div style="max-width: 279px">
@@ -183,8 +137,8 @@ const IndexPage = () => `
             },
           })}
         </div>
+        ${PlaceSwitchGroup()}
         <div id="map1" class="yandexMap" style="width: 800px; aspect-ratio: 1 / 1"></div>
-        <input type="text" id="searchAddress" />
       </main>
     </body>
   </html>

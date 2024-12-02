@@ -82,6 +82,9 @@ export class FilterManager {
 
   //Обновления UI
   applyFilters(filtersCfg) {
+    const isEmptyObj = (obj) =>
+      obj && Object.keys(obj).length === 0 && obj.constructor === Object;
+    if (isEmptyObj(filtersCfg)) return;
     //TODO: опять подвязка на inputs. Нужно подумать над этим
     const { inputs } = filtersCfg;
     Object.entries(inputs).forEach(([name, data]) => {
