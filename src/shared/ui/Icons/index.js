@@ -1,6 +1,7 @@
 export { BarIcon } from "./ui/BarIcon.js";
 export { CancelIcon } from "./ui/CancelIcon.js";
 export { CenterIcon } from "./ui/CenterIcon.js";
+export { CenterMapIcon } from "./ui/CenterMapIcon.js";
 export { CheckIcon } from "./ui/CheckIcon.js";
 export { CinemaIcon } from "./ui/CinemaIcon.js";
 export { DeleteIcon } from "./ui/DeleteIcon.js";

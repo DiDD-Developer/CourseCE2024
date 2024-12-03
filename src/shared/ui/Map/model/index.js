@@ -1,4 +1,4 @@
-import { Swiper } from "swiper";
+import Swiper from "swiper";
 import { Pagination } from "swiper/modules";
 import {
   iconsPresets,
@@ -27,12 +27,14 @@ export class YandexMap {
     iconShapeCfg,
   }) {
     this.containerSelector = containerSelector;
+    this.containerMap = document.querySelector(this.containerSelector);
     this.apiKey = apiKey;
     this.center = center;
     this.zoom = zoom;
     this.lang = lang;
     this.apiUrl = apiUrl;
     this.instance = null;
+    this.centerMarker = null; //Центральная иконка на карте
     this.iconsPresets = iconsPresets;
     this.currentBalloon = null;
     this.currentMarkerIdOpen = null;
@@ -188,6 +190,11 @@ export class YandexMap {
         suppressMapOpenBlock: true, // Скрыть кнопку открытия карты на Яндексе
       }
     );
+    this.showTooltip(
+      "Адрес можно выбрать на карте",
+      "Перетаскивайте метку или кликайте по карте"
+    );
+    this.addCenterMarker();
     this.#bindEvents();
     return this.instance;
   }
@@ -215,6 +222,41 @@ export class YandexMap {
       return this.instance;
     } catch (error) {
       console.error("Ошибка при загрузке API Яндекс.Карт:", error);
+    }
+  }
+
+  @checkMapInstance
+  showTooltip(OneMessage, TwoMessage) {
+    try {
+      // Проверяем существование контейнера для карты
+      if (!this.containerMap) {
+        throw new Error("Контейнер карты не найден.");
+      }
+
+      // Создаем элемент подсказки
+      const tooltip = document.createElement("div");
+      tooltip.className = this.classNames["tooltip"]; // Используем классы из style.pcss
+      tooltip.innerHTML = `
+            <div class="${this.classNames["ToolTipCenterMarker"]}">
+              ${this.iconsPresets["centerMarker"]}
+            </div>
+            <div class="${this.classNames["tooltipText"]} bold">
+              ${OneMessage}
+            </div>
+            <div class="${this.classNames["tooltipText"]} small">
+              ${TwoMessage}
+            </div>
+          `;
+
+      // Добавляем подсказку в контейнер карты
+      this.containerMap.appendChild(tooltip);
+
+      // Удаляем подсказку через 5 секунд
+      setTimeout(() => {
+        tooltip.remove();
+      }, 5000);
+    } catch (e) {
+      console.error("Ошибка при отображении подсказки:", e);
     }
   }
 
@@ -263,6 +305,19 @@ export class YandexMap {
     });
 
     this.instance.geoObjects.add(placemark);
+  }
+
+  @checkMapInstance
+  addCenterMarker() {
+    try {
+      const centerMarker = document.createElement("div");
+      centerMarker.className = this.classNames["centerMarker"];
+      centerMarker.innerHTML = this.iconsPresets["centerMarker"];
+      this.containerMap.appendChild(centerMarker);
+      this.centerMarker = centerMarker;
+    } catch (e) {
+      console.error("Ошибка при добавлении центральной метки:", e);
+    }
   }
 
   handleMarkerClick(id, e) {

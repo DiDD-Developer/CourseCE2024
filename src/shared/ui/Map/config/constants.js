@@ -1,6 +1,7 @@
 import {
   CheckIcon,
   CancelIcon,
+  CenterMapIcon,
   BarIcon,
   CinemaIcon,
   RestIcon,
@@ -19,6 +20,10 @@ export const classNames = {
   ballonMarksEditAndDelete: "yandexMap__ballonMarksEditAndDelete",
   ballonSwiperContent: "yandexMap__ballonSwiperContent",
   mark: "yandexMap__mark",
+  centerMarker: "yandexMap__centerMarker",
+  tooltip: "yandexMap__tooltip",
+  tooltipText: "yandexMap__tooltipText",
+  ToolTipCenterMarker: "yandexMap__ToolTipCenterMarker",
 };
 
 export const iconShapeCfg = {
@@ -28,13 +33,14 @@ export const iconShapeCfg = {
 };
 
 export const iconsPresets = {
-  1: BarIcon({ iconColor: "var(--colorRed)" }),
-  2: CinemaIcon({ iconColor: "var(--colorMantis)" }),
-  3: RestIcon({ iconColor: "var(--colorOrangeWeb)" }),
-  4: MusicIcon({ iconColor: "var(--colorPictonBlue)" }),
-  5: TheatreIcon({ iconColor: "var(--colorVeronica)" }),
+  bars: BarIcon({ iconColor: "var(--colorRed)" }),
+  cinema: CinemaIcon({ iconColor: "var(--colorMantis)" }),
+  restaurant: RestIcon({ iconColor: "var(--colorOrangeWeb)" }),
+  trk: MusicIcon({ iconColor: "var(--colorPictonBlue)" }),
+  theatre: TheatreIcon({ iconColor: "var(--colorVeronica)" }),
   6: CheckIcon({ extraClasses: ["btn--isGreenLightIcon"] }),
   7: CancelIcon({ extraClasses: ["btn--isRedIcon"] }),
+  centerMarker: CenterMapIcon({ iconColor: "var(--colorGray)" }),
 };
 
 export const yandexMapCustomEventNames = {
